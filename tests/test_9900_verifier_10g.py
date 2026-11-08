@@ -58,7 +58,7 @@ def _compute_10g_verifier(user, password):
     """
 
     def des_cbc(key, data):
-        encryptor = Cipher(TripleDES(key), modes.CBC(bytes(8))).encryptor()
+        encryptor = Cipher(TripleDES(key * 3), modes.CBC(bytes(8))).encryptor()
         return encryptor.update(data) + encryptor.finalize()
 
     text = (user + password).upper().encode("utf-16-be")

@@ -180,8 +180,8 @@ except ImportError:
 
 
 def _des_cbc(key8, data):
-    """Single DES-CBC (TripleDES with an 8-byte key), zero IV."""
-    cipher = Cipher(_TripleDES(key8), modes.CBC(bytes(8)))
+    """Single DES-CBC (TripleDES with the key repeated to K1=K2=K3), zero IV."""
+    cipher = Cipher(_TripleDES(key8 * 3), modes.CBC(bytes(8)))
     encryptor = cipher.encryptor()
     return encryptor.update(data) + encryptor.finalize()
 
