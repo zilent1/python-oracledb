@@ -1,4 +1,24 @@
-# python-oracledb
+# python-oracledb (oracledb-o5logon fork)
+
+> **Unofficial fork.** This is `oracledb-o5logon`, a derivative of Oracle's
+> [python-oracledb](https://github.com/oracle/python-oracledb). It is not made,
+> endorsed or supported by Oracle. The one functional change: thin mode can log
+> on to accounts whose password only carries the legacy 10G (DES) verifier
+> (verifier type 0x939). Upstream raises DPY-3015 for those accounts.
+>
+> It installs the same `oracledb` import package, so it replaces the official
+> one. Remove that first, and keep it from coming back as a dependency:
+>
+> ```
+> python -m pip uninstall oracledb
+> python -m pip install oracledb-o5logon
+> ```
+>
+> Versions are `<upstream version>.<fork revision>`, so `26.1.0.1` is the first
+> fork release based on python-oracledb 26.1.0. Report problems with this
+> fork at https://github.com/zilent1/python-oracledb/issues, not to Oracle.
+>
+> Everything below is the upstream README.
 
 The python-oracledb driver is the widely used, open-source [Python][python]
 extension module allowing Python programs to connect directly to [Oracle

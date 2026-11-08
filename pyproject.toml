@@ -7,10 +7,11 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oracledb"
-description = "Python interface to Oracle Database"
-keywords = ["Oracle", "database"]
+name = "oracledb-o5logon"
+description = "Unofficial fork of python-oracledb whose thin mode can log on to accounts with only a 10G password verifier"
+keywords = ["Oracle", "database", "O5LOGON", "10G verifier"]
 authors = [{name = "Anthony Tuininga", email = "anthony.tuininga@oracle.com"}]
+maintainers = [{name = "Rafael Fabian Ruske"}]
 license = "UPL-1.0 OR Apache-2.0"
 license-files = [
     "LICENSE.txt",
@@ -50,8 +51,9 @@ Installation = "https://python-oracledb.readthedocs.io/en/latest/user_guide/inst
 Samples = "https://github.com/oracle/python-oracledb/tree/main/samples"
 Documentation = "http://python-oracledb.readthedocs.io"
 "Release Notes" = "https://python-oracledb.readthedocs.io/en/latest/release_notes.html"
-Issues = "https://github.com/oracle/python-oracledb/issues"
-Source = "https://github.com/oracle/python-oracledb"
+Issues = "https://github.com/zilent1/python-oracledb/issues"
+Source = "https://github.com/zilent1/python-oracledb/tree/release/o5logon"
+Upstream = "https://github.com/oracle/python-oracledb"
 
 [project.optional-dependencies]
 opentelemetry = ["opentelemetry-api ~= 1.12"]

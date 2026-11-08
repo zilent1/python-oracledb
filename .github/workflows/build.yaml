@@ -1,15 +1,21 @@
 name: Build python-oracledb packages
 
+# fork: release tags are "o5-v<version>" (e.g. o5-v26.1.0.1) so they never
+# collide with the upstream "v*" tags fetched from oracle/python-oracledb
 on:
   push:
     tags:
-      - v*
+      - o5-v*
   workflow_dispatch:
     inputs:
       tgt:
         description: List of package targets to build
         default: 'Linux, macOS, Windows, Source'
         required: false
+      publish:
+        description: Publish a full build to TestPyPI
+        type: boolean
+        default: false
 permissions:
   contents: read
 
@@ -205,3 +211,46 @@ jobs:
         with:
           name: python-oracledb-wheels
           delete-merged: true
+
+  # fork: publish through PyPI Trusted Publishing (OIDC, no stored token).
+  # Tag pushes go to PyPI; a manual run with "publish" checked goes to
+  # TestPyPI. Both need every build job to succeed.
+  publish:
+    name: Publish to ${{ github.event_name == 'push' && 'PyPI' || 'TestPyPI' }}
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/o5-v'))
+      || (github.event_name == 'workflow_dispatch' && inputs.publish
+          && inputs.tgt == 'Linux, macOS, Windows, Source')
+    needs: [build_source_package, build_linux_wheels, build_macos_wheels,
+            build_windows_wheels, combine_artifacts]
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'push' && 'pypi' || 'testpypi' }}
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check that the tag matches the package version
+        if: github.event_name == 'push'
+        run: |
+          version=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' \
+                    src/oracledb/version.py)
+          if [ "o5-v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME does not match version $version"
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+                                       # v8.0.2
+        with:
+          name: python-oracledb-wheels
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
+                                         # v1.14.3
+        with:
+          repository-url: ${{ github.event_name == 'push' && 'https://upload.pypi.org/legacy/' || 'https://test.pypi.org/legacy/' }}
