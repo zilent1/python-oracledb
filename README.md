@@ -18,6 +18,28 @@
 > fork release based on python-oracledb 26.1.0. Report problems with this
 > fork at https://github.com/zilent1/python-oracledb/issues, not to Oracle.
 >
+> ### 10G password verifier support (thin mode)
+>
+> Accounts whose password only has the 10G verifier (created before Oracle
+> 11g, or with `IDENTIFIED BY VALUES` and a 10G hash) can connect in thin
+> mode, through the same O5LOGON handshake that thick mode uses. No new
+> parameters or settings are involved; connect as usual:
+>
+> ```python
+> import oracledb
+>
+> conn = oracledb.connect(user="legacy_user", password="...", dsn="host/service")
+> ```
+>
+> The database must still accept 10G logons: `SQLNET.ALLOWED_LOGON_VERSION_SERVER`
+> in its `sqlnet.ora` must be 11 or lower. Otherwise the server rejects the
+> logon with ORA-28040, as it would for any client. Accounts with 11G or 12C
+> verifiers authenticate exactly as in upstream.
+>
+> The 10G verifier is a weak, case-insensitive DES hash. Prefer moving these
+> accounts to a 12C verifier (resetting the password does that) when you can;
+> this fork is meant for databases where that is not yet possible.
+>
 > Everything below is the upstream README.
 
 The python-oracledb driver is the widely used, open-source [Python][python]
@@ -116,7 +138,9 @@ with oracledb.connect(user=un, password=pw, dsn=cs) as connection:
 
 - Oracle Database
 
-  **Thin mode**: Oracle Database 12.1 or later is required.
+  **Thin mode**: Oracle Database 12.1 or later is required. In this fork, thin
+  mode also authenticates accounts that only have the legacy 10G password
+  verifier (see the note at the top).
 
   **Thick mode**: Oracle Database 11.2 or later is required, depending on the
   Oracle Client release.  Oracle Database's standard client-server version
